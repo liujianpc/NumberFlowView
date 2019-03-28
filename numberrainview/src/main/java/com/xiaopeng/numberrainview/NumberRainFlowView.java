@@ -9,13 +9,17 @@ import android.widget.LinearLayout;
 /**
  * Date: 2018/4/24
  * Created by LiuJian
+ * @author XP-PC-XXX
  */
 
 public class NumberRainFlowView extends LinearLayout {
 
     private int mNormalColor = Color.GREEN;
-    private int hightLightColor = Color.YELLOW;
-    private float textSize = 15 * getResources().getDisplayMetrics().density;
+    private int mHightLightColor = Color.YELLOW;
+    private float mTextSize = 30 * getResources().getDisplayMetrics().density;
+    private  LinearLayout.LayoutParams mLayoutParams;
+
+    private final int mCount = (int) (getResources().getDisplayMetrics().widthPixels / mTextSize);
 
     public NumberRainFlowView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -24,7 +28,7 @@ public class NumberRainFlowView extends LinearLayout {
 
     private void init(Context context, AttributeSet attrs) {
         if (attrs != null) {
-            pareseAttrs(context, attrs);
+            parseAttribute(context, attrs);
         }
         initNormal();
     }
@@ -32,13 +36,15 @@ public class NumberRainFlowView extends LinearLayout {
     private void initNormal() {
         setOrientation(HORIZONTAL);
         setBackgroundColor(Color.BLACK);
+        mLayoutParams =
+                new LinearLayout.LayoutParams((int) mTextSize + 10, getResources().getDisplayMetrics().heightPixels);
     }
 
-    private void pareseAttrs(Context context, AttributeSet attrs) {
+    private void parseAttribute(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.NumberRain);
         mNormalColor = typedArray.getColor(R.styleable.NumberRain_normalColor, Color.GREEN);
-        hightLightColor = typedArray.getColor(R.styleable.NumberRain_highLightColor, Color.RED);
-        textSize = typedArray.getDimension(R.styleable.NumberRain_textSize, textSize);
+        mHightLightColor = typedArray.getColor(R.styleable.NumberRain_highLightColor, Color.RED);
+        mTextSize = typedArray.getDimension(R.styleable.NumberRain_textSize, mTextSize);
         typedArray.recycle();
     }
 
@@ -48,17 +54,21 @@ public class NumberRainFlowView extends LinearLayout {
         addRainItems();
     }
 
+    /**
+     * 添加每一列
+     */
     private void addRainItems() {
-        int count = (int) (getResources().getDisplayMetrics().widthPixels / textSize);
-        for (int i = 0; i < count; i++) {
 
+        /**
+         * 遍歷每一列
+         */
+        for (int i = 0; i < mCount; i++) {
             NumberRainItem rainItem = new NumberRainItem(getContext(), null);
-            rainItem.setmHighlightColor(hightLightColor);
-            rainItem.setTextSize(textSize);
-            rainItem.setmNormalColor(mNormalColor);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams((int) textSize + 10, getResources().getDisplayMetrics().heightPixels);
-            rainItem.setStartOffset((int) (Math.random() * 1000));
-            addView(rainItem, layoutParams);
+            rainItem.setHighlightColor(mHightLightColor);
+            rainItem.setTextSize(mTextSize);
+            rainItem.setNormalColor(mNormalColor);
+            rainItem.setStartOffset((int) (Math.random() * 10000));
+            addView(rainItem, mLayoutParams);
         }
     }
 }

@@ -11,18 +11,21 @@ import android.view.View;
 /**
  * Date: 2018/4/24
  * Created by LiuJian
+ * @author XP-PC-XXX
  */
 
 public class NumberRainItem extends View {
 
+    private  final float DISPLAY_HEIGHT = getResources().getDisplayMetrics().heightPixels;
     private Paint mPaint;
-    private float textSize = 15 * getResources().getDisplayMetrics().density;
+    private float mTextSize = 30 * getResources().getDisplayMetrics().density;
     private int mNormalColor = Color.GREEN;
     private int mHighlightColor = Color.YELLOW;
-    private long startOffset = 0L;
+    private long mStartOffset = 1000L;
 
     private float mNowHeight = 0f;
     private int mHighlightNumIndex = 0;
+    private int mVerticalTTotalCount = (int) (DISPLAY_HEIGHT / mTextSize);
 
     public NumberRainItem(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -40,45 +43,47 @@ public class NumberRainItem extends View {
 
     private void initPaint() {
         mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        mPaint.setTextSize(mTextSize);
+        mPaint.setColor(mNormalColor);
     }
 
     private void parseAttrs(Context context, AttributeSet attrs) {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.NumberRainItem);
         mNormalColor = typedArray.getColor(R.styleable.NumberRainItem_normalColor, Color.GREEN);
         mHighlightColor = typedArray.getColor(R.styleable.NumberRain_highLightColor, Color.YELLOW);
-        textSize = typedArray.getDimension(R.styleable.NumberRainItem_textSize, textSize);
+        mTextSize = typedArray.getDimension(R.styleable.NumberRainItem_textSize, mTextSize);
         typedArray.recycle();
     }
 
-    public void setmPaint(Paint mPaint) {
+    public void setPaint(Paint mPaint) {
         this.mPaint = mPaint;
         postInvalidateDelayed(1000);
     }
 
     public void setTextSize(float textSize) {
-        this.textSize = textSize;
+        this.mTextSize = textSize;
         postInvalidateDelayed(1000);
     }
 
-    public void setmNormalColor(int mNormalColor) {
+    public void setNormalColor(int mNormalColor) {
         this.mNormalColor = mNormalColor;
         postInvalidateDelayed(1000);
     }
 
-    public void setmHighlightColor(int mHighlightColor) {
+    public void setHighlightColor(int mHighlightColor) {
         this.mHighlightColor = mHighlightColor;
         postInvalidateDelayed(1000);
     }
 
     public void setStartOffset(int startOffset) {
-        this.startOffset = startOffset;
+        this.mStartOffset = startOffset;
         postInvalidateDelayed(1000);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        configPaint();
+        //configPaint();
         if (isShowAllNumber()) {
             drawTotalNumbers(canvas);
         } else {
@@ -87,25 +92,25 @@ public class NumberRainItem extends View {
     }
 
     private void configPaint() {
-        mPaint.setTextSize(textSize);
+        mPaint.setTextSize(mTextSize);
         mPaint.setColor(mNormalColor);
     }
 
     private void drawPartNumbers(Canvas canvas) {
-        int count = (int) (mNowHeight / textSize);
-        mNowHeight += textSize;
+        int count = (int) (mNowHeight / mTextSize);
+        mNowHeight += mTextSize;
         drawNumbers(canvas, count);
     }
 
     private void drawTotalNumbers(Canvas canvas) {
-        int count = (int) (getResources().getDisplayMetrics().heightPixels / textSize);
-        drawNumbers(canvas, count);
+
+        drawNumbers(canvas, mVerticalTTotalCount);
     }
 
     private void drawNumbers(Canvas canvas, int count) {
 
         if (count == 0) {
-            postInvalidateDelayed(startOffset);
+            postInvalidateDelayed(mStartOffset);
         } else {
 
             float offset = 0f;
@@ -115,14 +120,14 @@ public class NumberRainItem extends View {
                 String text = String.valueOf((int) (Math.random() * 10));
                 if (mHighlightNumIndex == i) {
                     mPaint.setColor(mHighlightColor);
-                    mPaint.setShadowLayer(10f, 0f, 0f, mHighlightColor);
+                    //mPaint.setShadowLayer(10f, 0f, 0f, mHighlightColor);
                 } else {
                     mPaint.setColor(mNormalColor);
-                    mPaint.setShadowLayer(10f, 0f, 0f, mNormalColor);
+                    //mPaint.setShadowLayer(10f, 0f, 0f, mNormalColor);
                 }
 
-                canvas.drawText(text, 0f, textSize + offset, mPaint);
-                offset += textSize;
+                canvas.drawText(text, 0f, mTextSize + offset, mPaint);
+                offset += mTextSize;
 
             }
             if (!isShowAllNumber()) {
@@ -130,11 +135,11 @@ public class NumberRainItem extends View {
             } else {
                 mHighlightNumIndex = (++mHighlightNumIndex) % count;
             }
-            postInvalidateDelayed(100L);
+            postInvalidateDelayed(10L);
         }
     }
 
     private boolean isShowAllNumber() {
-        return mNowHeight >= getResources().getDisplayMetrics().heightPixels;
+        return mNowHeight >= DISPLAY_HEIGHT;
     }
 }
